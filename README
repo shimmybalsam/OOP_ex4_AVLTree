@@ -1,0 +1,112 @@
+shimmy10
+
+
+=============================
+=      Submitted files     =
+=============================
+1. AvlTree.java
+2. BinaryTree.java
+3. Node.java
+4. NoDataException.java
+5. README
+
+=============================
+=      File description     =
+=============================
+1. BinaryTree.java - represent an abstract Binary Tree from which the AvlTree extends.
+All of BinaryTree Method's are abstract and they are aquivilant to 4 out of the five main method's of AvlTree:
+add, delete, contains, size.
+
+2. Node.java - represents a single node within the AvlTree. This class is used in a composition manner.
+Node's important method's are it's getters and setters for it's father, right_son, left_son, height and data.
+
+3. NoDataException.java - represents an exception which in thrown in case a constructor is called based on a
+non existent (null) data array or tree.
+Used in a composition manner. It's only method is a constructor which calls super(), to get an exception.
+This class does not appear in my UML which I submitted last week because I didn't know back then that I would need
+this exception.
+
+=============================
+=  Implementation details   =
+=============================
+1. I decided to implement the BinaryTree class as abstract because, at the end of the day, an AvlTree is a sort
+of BinaryTree, with only one specific different characteristic, which is the constant height balance.
+As such, and as shown in class for example that a Dog is a type of an Animal, such an AvlTree is a Type
+of a BinaryTree.
+Suffice to say, I could have created an abstract Tree class, from which the BinaryTree would extend (because there
+are other kinds of trees too), I could have also not made BinaryTree abstract and implement it's add, delete, etc,
+functions and let Avltree override them, but seeing that there might be distinct functions needed as such, and seeing
+that there are also Red-Black and 2-3 BinaryTrees, I decided to not do the above so that to concentrate correctly
+on Avl characteristics. Also otherwise, I would have had to deal with generic issues, which we have not fully learned
+about yet in this course.
+
+2. I decided to create the NoDataException class, rather than to just use a NullPointerException,
+because the exception here is not a general null point, rather the fact that an entire Data Structure was
+supposed to be given, but was not.
+
+3. add() - flow:
+a. Checks if the value is already existing in the AvlTree, using the contains() function which takes O(logn).
+ if the value already exits, returns false and we're done.
+
+b. Checks if the tree is empty (root is null), if so creates a new node (which is now the root) the the new value.
+Otherwise, calls upon and enters the recursive function checkAddPerSubTree():
+
+c. Runs down the tree, in a recursive matter, based on a binary search of larger than or smaller than the current node,
+finding its way down to the correct spot to be added as a new node. After adding I update the heights of all nodes
+affected by the adding, going upwards, using the height_update() function (Ologn), which calls upon the
+checkHeight() function (O(1)) which checks for each of nodes children if the are null or not, returning 0 for null,
+height+1 otherwise..
+
+d. Once the correct spot was found and the new node was added with the newValue, I call upon the balance() functioin
+which takes O(logn), which scrolles up the tree to find if by adding the new node, I created an imbalance, if so,
+balance() will return the node which is now imbalanced ("the cause"), if null is returnes then the tree is balanced..
+
+e. If the imbalanced node is different than null then I call upon the rebalance() (O(1)) which checks the error and
+decided which rotation must be done, calling said rotation as needed. The rotations are done by the functions:
+rotateRight(), rotateLeft(), rotateLeftRight(), rotateRightLeft(). Each costing O(logn) because although tha actual
+rotation is only O(1) after the rotation, but still within rotation function, height_update() (O(logn)) will be called
+upon again.
+
+
+4. delete() - flow:
+a. Checks if the value to be deleted does not exist in the AvlTree, using the contains() function which takes O(logn).
+    if so, returns false and we're done.
+
+b. Calls upon and enters the recursive function checkDeleteAllSubTrees():
+
+c. Runs down the tree, in a recursive matter, based on a binary search of larger than or smaller than the current node,
+   finding its way down to the node who's data is equal to the value which needs to be deleted.
+
+d. Once the right node was found, checks if it has no children and no parent, if so that means it is the root and the
+only node in the tree, as such changes the node to null and we're done.
+
+e. Otherwise, if has no children but has a parent, checks if it the right or left child of said parent, and updates
+that direction child of the parent to null and makes that node's parent null, thus disconnecting it from the tree.
+If it does have children, finds the node of its descendants who binarily should change him. switches the data and
+updates the parent-children connections as needed.
+
+f. Once deleted calls upon height_update (O(logn), as explained in add()).
+
+g. Calss upon balance() (O(logn)) and rebalance() (O(logn)), as explained in add().
+
+
+4. All together, both add() and delete() run asymptotically in O(logn) and both call upon (within each of their
+separate recursive helper functions) the functions: contains(), height_update() (which calls upon checkHeight()),
+balance() and rebalance() (which calls upon the different rotation functions as needed per case).
+
+
+=============================
+=    Answers to questions   =
+=============================
+1. A set of 12 numbers which will force the height of 4, when inserted one by one in this distinct prder, is:
+{15,7,20,6,10,19,24,5,18,23,25,26}
+
+2. The asymptotic running time complexity of my tree construction from an array of length n done in
+AvlTree(int[] data) wil be O(nlogn). This is because for eace number in the data array I add a node in the new AvlTree.
+Each add() takes O(logn) and seeing that data's length is n I will be calling add() n times, so altogether
+that comes out, as said above, to O(nlogn).
+
+3. The asymptotic running time complexity of my tree construction done in AvlTree(AvlTree avlTree) will also be
+O(nlogn), this is because, per Node in the tree that we deepcopy, we use our add function of O(logn), altogether n times
+just like in AvlTree(int[] data). In addition during the construction we also call upon the construction of an iterator,
+which takes O(n). so all together this would be O(n + nlogn) = O(nlogn).
